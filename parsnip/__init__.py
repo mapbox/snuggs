@@ -1,46 +1,51 @@
-import logging
 import operator
 import re
 import sys
 
 from pyparsing import (
-    alphanums, OneOrMore, nums, oneOf, Word, Literal, Suppress, Combine,
-    ParseException, Forward, Group, CaselessLiteral, Optional, alphas, Regex)
+    alphanums, ZeroOrMore, nums, oneOf, Word, Literal, Combine,
+    ParseException, Forward, Group, CaselessLiteral, Optional, alphas)
 
 import numpy
 
-logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
-logger = logging.getLogger('calc')
+
+# Python 2-3 compatibility
+string_types = (str,) if sys.version_info[0] >= 3 else (basestring,)
 
 
-class Sources(object):
+class Context(object):
 
     def __init__(self):
-        self._sources = {}
+        self._data = {}
 
-    def addSource(self, name, val):
-        self._sources[name] = val
+    def add(self, name, val):
+        self._data[name] = val
 
-    def getSource(self, index):
-        parts = index.split(',')
-        index = parts.pop(0)
-        subindex = parts.pop(0) if parts else None
-        if index in self._sources:
-            s = self._sources[index]
+    def get(self, args):
+        index = args.pop(0)
+        subindex = args.pop(0) if args else None
+        if index in self._data:
+            s = self._data[index]
         else:
-            s = self._sources.values()[int(index)-1]
+            s = self._data.values()[int(index)-1]
         if subindex:
-            return s[subindex]
+            return s[int(subindex)-1]
         else:
             return s
 
-sources = Sources()
+ctx = Context()
 
 op_map = {
     '*': operator.mul,
     '+': operator.add,
     '/': operator.div,
-    '-': operator.sub}
+    '-': operator.sub
+    }
+
+func_map = {
+    'list': numpy.asanyarray,
+    'ra': ctx.get
+    }
 
 expr = Forward()
 
@@ -49,6 +54,7 @@ decimal = Literal('.')
 e = CaselessLiteral('E')
 sign = Literal('+') | Literal('-')
 number = Word(nums)
+name = Word(alphas)
 
 integer = Combine(
     Optional(sign) +
@@ -57,23 +63,9 @@ integer = Combine(
 
 real = Combine(
     integer +
-    Optional(decimal + Optional(number)) +
+    decimal + Optional(number) +
     Optional(e + integer)
     ).setParseAction(lambda s, l, t: float(t[0]))
-
-filename = Word(alphanums + "/-_. ")
-shortname = Word(alphas)
-index = Word(nums).setParseAction(lambda s, l, t: int(t[0])-1)
-
-lbracket = Literal('[').suppress()
-rbracket = Literal(']').suppress()
-
-array = Combine(
-    lbracket +
-    (filename | shortname | index) +
-    Optional(Literal(',') + index) +
-    rbracket
-    ).setParseAction(lambda s, l, t: sources.getSource(t[0]))
 
 lparen = Literal('(').suppress()
 rparen = Literal(')').suppress()
@@ -82,15 +74,21 @@ op = oneOf('+ - * /').setResultsName('op').setParseAction(
     lambda s, l, t: op_map[t[0]])
 
 func = Word(alphanums).setResultsName('func').setParseAction(
-    lambda s, l, t: getattr(numpy, t[0]))
+    lambda s, l, t: func_map[t[0]])
 
-operand = expr | array | real | integer
+operand = expr | name | real | integer
 
-expr << Group(lparen + (op | func) + operand + OneOrMore(operand) + rparen)
+expr << Group(
+    lparen +
+    (op | func) +
+    operand +
+    Optional(operand) +
+    ZeroOrMore(expr) +
+    rparen)
 
 
 def processArg(arg):
-    if isinstance(arg, (int, float, numpy.ndarray)):
+    if isinstance(arg, string_types + (int, float, numpy.ndarray)):
         return arg
     else:
         return processList(arg)
