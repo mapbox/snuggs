@@ -36,9 +36,8 @@ Add two arrays.
 
     import numpy
     import parsnip
-    parsnip.ctx.add('foo', numpy.ones((2, 2)))
-    parsnip.ctx.add('bar', numpy.ones((2, 2)))
-    print parsnip.handleLine('(+ (ra foo) (* 2.5 (ra bar)))')
+    with parsnip.ctx(foo=numpy.ones((2, 2)), bar=numpy.ones((2, 2))):
+        print parsnip.handleLine('(+ (ra foo) (* 2.5 (ra bar)))')
     # Output:
     # [[ 3.5  3.5]
     #  [ 3.5  3.5]]

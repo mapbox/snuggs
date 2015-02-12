@@ -33,7 +33,27 @@ class Context(object):
         else:
             return s
 
-ctx = Context()
+    def clear(self):
+        self._data = {}
+
+_ctx = Context()
+
+
+class ctx(object):
+
+    def __init__(self, **kwds):
+        self.kwds = kwds
+
+    def __enter__(self):
+        _ctx.clear()
+        for k, v in self.kwds.items():
+            _ctx.add(k, v)
+        return self
+
+    def __exit__(self, exc_type=None, exc_val=None, exc_tb=None):
+        self.kwds = None
+        _ctx.clear()
+
 
 op_map = {
     '*': operator.mul,
@@ -44,7 +64,7 @@ op_map = {
 
 func_map = {
     'list': numpy.asanyarray,
-    'ra': ctx.get
+    'ra': _ctx.get
     }
 
 expr = Forward()
