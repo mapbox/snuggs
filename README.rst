@@ -24,7 +24,7 @@ Examples
 .. code-block:: python
 
     import parsnip
-    print npcalc.handleLine('(+ 1 2)')
+    print parsnip.handleLine('(+ 1 2)')
     # Output:
     # 3
 
