@@ -8,7 +8,7 @@ with codecs_open('README.rst', encoding='utf-8') as f:
 
 
 setup(name='parsnip',
-      version='0.0.1',
+      version='1.0',
       description=u"Parsnip parses and evaluates lisp-like Numpy expressions",
       long_description=long_description,
       classifiers=[],

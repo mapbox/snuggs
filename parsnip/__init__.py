@@ -1,13 +1,24 @@
+"""
+Parsnip parses and evaluates lisp-like Numpy expressions.
+
+Pastinaca sativa, the root vegetable also known as Parsnip, is a close
+relative of the carrot.
+"""
+
+
 import operator
 import re
 import sys
 
 from pyparsing import (
-    alphanums, ZeroOrMore, nums, oneOf, Word, Literal, Combine,
+    alphanums, ZeroOrMore, nums, oneOf, Word, Literal, Combine, QuotedString,
     ParseException, Forward, Group, CaselessLiteral, Optional, alphas)
 
 import numpy
 
+
+__all__ = ['eval']
+__version__ = "1.0"
 
 # Python 2-3 compatibility
 string_types = (str,) if sys.version_info[0] >= 3 else (basestring,)
@@ -21,13 +32,11 @@ class Context(object):
     def add(self, name, val):
         self._data[name] = val
 
-    def get(self, args):
-        index = args.pop(0)
-        subindex = args.pop(0) if args else None
-        if index in self._data:
-            s = self._data[index]
-        else:
-            s = self._data.values()[int(index)-1]
+    def get(self, name):
+        return self._data[name]
+
+    def lookup(self, index, subindex=None):
+        s = self._data.values()[int(index)-1]
         if subindex:
             return s[int(subindex)-1]
         else:
@@ -59,12 +68,21 @@ op_map = {
     '*': operator.mul,
     '+': operator.add,
     '/': operator.div,
-    '-': operator.sub
+    '-': operator.sub,
+    '<': operator.lt,
+    '<=': operator.le,
+    '==': operator.eq,
+    '!=': operator.ne,
+    '>=': operator.ge,
+    '>': operator.gt,
+    '&': operator.and_,
+    '|': operator.or_
     }
 
 func_map = {
-    'list': numpy.asanyarray,
-    'ra': _ctx.get
+    'asarray': lambda *args: numpy.asanyarray(args),
+    'read': _ctx.lookup,
+    'take': lambda a, idx: numpy.take(a, idx-1, axis=0),
     }
 
 expr = Forward()
@@ -75,6 +93,9 @@ e = CaselessLiteral('E')
 sign = Literal('+') | Literal('-')
 number = Word(nums)
 name = Word(alphas)
+
+var = name.setParseAction(
+    lambda s, l, t: _ctx.get(t[0]))
 
 integer = Combine(
     Optional(sign) +
@@ -87,23 +108,25 @@ real = Combine(
     Optional(e + integer)
     ).setParseAction(lambda s, l, t: float(t[0]))
 
+string = QuotedString("'") | QuotedString('"')
+
 lparen = Literal('(').suppress()
 rparen = Literal(')').suppress()
 
-op = oneOf('+ - * /').setResultsName('op').setParseAction(
+op = oneOf(' '.join(op_map.keys())).setResultsName('op').setParseAction(
     lambda s, l, t: op_map[t[0]])
 
-func = Word(alphanums).setResultsName('func').setParseAction(
-    lambda s, l, t: func_map[t[0]])
+func = Word(alphanums + '_').setResultsName('func').setParseAction(
+    lambda s, l, t: (
+        func_map[t[0]] if t[0] in func_map else getattr(numpy, t[0])))
 
-operand = expr | name | real | integer
+operand = expr | var | real | integer | string
 
 expr << Group(
     lparen +
     (op | func) +
     operand +
-    Optional(operand) +
-    ZeroOrMore(expr) +
+    ZeroOrMore(operand) +
     rparen)
 
 
@@ -119,9 +142,14 @@ def processList(lst):
     if lst.op:
         return lst.op(*args)
     if lst.func:
-        return lst.func(args)
+        return lst.func(*args)
 
 
 def handleLine(line):
     result = expr.parseString(line)
     return processList(result[0])
+
+
+def eval(source, **kwds):
+    with ctx(**kwds):
+        return handleLine(source)
