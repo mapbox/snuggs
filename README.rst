@@ -4,7 +4,11 @@ parsnip
 
 Parsnip parses and evaluates lisp-like Numpy expressions.
 
-It is based on several pyparsing examples.
+.. image:: https://travis-ci.org/mapbox/parsnip.svg?branch=master
+   :target: https://travis-ci.org/mapbox/parsnip
+
+.. image:: https://coveralls.io/repos/mapbox/parsnip/badge.png
+   :target: https://coveralls.io/r/mapbox/parsnip
 
 Expression syntax
 =================
