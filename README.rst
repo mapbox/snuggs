@@ -4,72 +4,90 @@ snuggs
 
 Snuggs are s-expressions for Numpy
 
+.. code-block:: pycon
+
+    >>> snuggs.eval("(+ a b)", a=np.array([1, 1]), b=np.array([2, 2]))
+    array([3, 3])
+
 .. image:: https://travis-ci.org/mapbox/snuggs.svg?branch=master
    :target: https://travis-ci.org/mapbox/snuggs
 
 .. image:: https://coveralls.io/repos/mapbox/snuggs/badge.svg
    :target: https://coveralls.io/r/mapbox/snuggs
 
-Expression syntax
-=================
+Syntax
+======
 
-Expressions have the following syntax:
+Snuggs wraps Numpy in expressions with the following syntax:
 
 .. code-block::
 
-    expr: ( (op | func) operand* )
-    operand: ( expr | name | number | string )
-
-Formal grammar is a TODO. Meanwhile, see the examples below.
+    expression = "(" (operator | function) *arg ")"
+    arg = expression | name | number | string
 
 Examples
 ========
 
-Add two numbers
+Addition of two numbers
+-----------------------
 
 .. code-block:: python
 
     import snuggs
-    print snuggs.eval('(+ 1 2)')
-    # Output:
+    snuggs.eval('(+ 1 2)')
     # 3
 
-Add a number and an array
+Multiplication of a number and an array
+---------------------------------------
+
+Arrays can be created using ``asarray``.
 
 .. code-block:: python
 
-    import numpy
-    print snuggs.eval('(+ 2.5 foo)', foo=numpy.ones((2, 2)))
-    # Output:
-    # [[ 3.5  3.5]
-    #  [ 3.5  3.5]]
+    snuggs.eval("(* 3.5 (asarray 1 1))")
+    # array([ 3.5,  3.5])
+
+Evaluation context
+------------------
+
+Expressions can also refer by name to arrays in a local context.
+
+.. code-block:: python
+
+    snuggs.eval("(+ (asarray 1 1) b)", b=np.array([2, 2]))
+    # array([3, 3])
 
 Functions and operators
 =======================
 
 Arithmetic (``* + / -``) and logical (``< <= == != >= > & |``) operators are
-available. Members of the ``numpy`` module such as ``mean()`` and ``where()``
-are also available.
+available. Members of the ``numpy`` module such as ``asarray()``, ``mean()``,
+and ``where()`` are also available.
 
 .. code-block:: python
 
-    print snuggs.eval('(> (+ foo (mean foo)) 1)', foo=numpy.ones((2, 2)))
-    # Output:
-    # array([[ True,  True],
-    #        [ True,  True]], dtype=bool)
-
+    snuggs.eval("(mean (asarray 1 2 4))")
+    # 2.3333333333333335
 
 .. code-block:: python
 
-    print snuggs.eval('(where (& tt tf) 1 0)',
+    snuggs.eval('(where (& tt tf) 1 0)',
         tt=numpy.array([True, True]),
         tf=numpy.array([True, False]))
-    # Output:
-    # [1 0]
+    # array([1, 0])
 
 Performance notes
 =================
 
 Snuggs makes simple calculator programs possible. None of the optimizations
 of, e.g., `numexpr <https://github.com/pydata/numexpr>`__ (multithreading,
-elimination of temporary data, etc) exist.
+elimination of temporary data, etc) are currently available.
+
+If you're looking to combine Numpy with a more complete Lisp ,see
+<Hy https://github.com/hylang/hy>`__:
+
+.. code-block:: clojure
+
+    => (import numpy)
+    => (* 2 (.asarray numpy [1 2 3]))
+    array([2, 4, 6])
