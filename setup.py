@@ -7,15 +7,15 @@ with codecs_open('README.rst', encoding='utf-8') as f:
     long_description = f.read()
 
 
-setup(name='parsnip',
+setup(name='snuggs',
       version='1.0',
-      description=u"Parsnip parses and evaluates lisp-like Numpy expressions",
+      description=u"Snuggs are s-expressions for Numpy",
       long_description=long_description,
       classifiers=[],
       keywords='',
       author=u"Sean Gillies",
       author_email='sean@mapbox.com',
-      url='https://github.com/sgillies/parsnip',
+      url='https://github.com/mapbox/snuggs',
       license='MIT',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
       include_package_data=True,

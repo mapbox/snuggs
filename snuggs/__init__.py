@@ -1,8 +1,5 @@
 """
-Parsnip parses and evaluates lisp-like Numpy expressions.
-
-Pastinaca sativa, the root vegetable also known as Parsnip, is a close
-relative of the carrot.
+Snuggs are s-expressions for Numpy.
 """
 
 
@@ -36,7 +33,7 @@ class Context(object):
         return self._data[name]
 
     def lookup(self, index, subindex=None):
-        s = self._data.values()[int(index)-1]
+        s = list(self._data.values())[int(index)-1]
         if subindex:
             return s[int(subindex)-1]
         else:

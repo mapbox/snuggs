@@ -1,14 +1,14 @@
-=======
-parsnip
-=======
+======
+snuggs
+======
 
-Parsnip parses and evaluates lisp-like Numpy expressions.
+Snuggs are s-expressions for Numpy
 
-.. image:: https://travis-ci.org/mapbox/parsnip.svg?branch=master
-   :target: https://travis-ci.org/mapbox/parsnip
+.. image:: https://travis-ci.org/mapbox/snuggs.svg?branch=master
+   :target: https://travis-ci.org/mapbox/snuggs
 
-.. image:: https://coveralls.io/repos/mapbox/parsnip/badge.png
-   :target: https://coveralls.io/r/mapbox/parsnip
+.. image:: https://coveralls.io/repos/mapbox/snuggs/badge.png
+   :target: https://coveralls.io/r/mapbox/snuggs
 
 Expression syntax
 =================
@@ -29,8 +29,8 @@ Add two numbers
 
 .. code-block:: python
 
-    import parsnip
-    print parsnip.eval('(+ 1 2)')
+    import snuggs
+    print snuggs.eval('(+ 1 2)')
     # Output:
     # 3
 
@@ -39,7 +39,7 @@ Add a number and an array
 .. code-block:: python
 
     import numpy
-    print parsnip.eval('(+ 2.5 foo)', foo=numpy.ones((2, 2)))
+    print snuggs.eval('(+ 2.5 foo)', foo=numpy.ones((2, 2)))
     # Output:
     # [[ 3.5  3.5]
     #  [ 3.5  3.5]]
@@ -53,7 +53,7 @@ are also available.
 
 .. code-block:: python
 
-    print parsnip.eval('(> (+ foo (mean foo)) 1)', foo=numpy.ones((2, 2)))
+    print snuggs.eval('(> (+ foo (mean foo)) 1)', foo=numpy.ones((2, 2)))
     # Output:
     # array([[ True,  True],
     #        [ True,  True]], dtype=bool)
@@ -61,7 +61,7 @@ are also available.
 
 .. code-block:: python
 
-    print parsnip.eval('(where (& tt tf) 1 0)',
+    print snuggs.eval('(where (& tt tf) 1 0)',
         tt=numpy.array([True, True]),
         tf=numpy.array([True, False]))
     # Output:
@@ -70,6 +70,6 @@ are also available.
 Performance notes
 =================
 
-Parsnip makes simple calculator programs possible. None of the optimizations
+Snuggs makes simple calculator programs possible. None of the optimizations
 of, e.g., `numexpr <https://github.com/pydata/numexpr>`__ (multithreading,
 elimination of temporary data, etc) exist.
