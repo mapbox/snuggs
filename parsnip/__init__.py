@@ -67,7 +67,7 @@ class ctx(object):
 op_map = {
     '*': operator.mul,
     '+': operator.add,
-    '/': operator.div,
+    '/': operator.truediv if sys.version_info[0] >= 3 else operator.div
     '-': operator.sub,
     '<': operator.lt,
     '<=': operator.le,
