@@ -4,7 +4,7 @@ snuggs
 
 Snuggs are s-expressions for Numpy
 
-.. code-block:: pyython
+.. code-block:: python
 
     >>> snuggs.eval("(+ (asarray 1 1) (asarray 2 2))")
     array([3, 3])
