@@ -84,7 +84,7 @@ of, e.g., `numexpr <https://github.com/pydata/numexpr>`__ (multithreading,
 elimination of temporary data, etc) are currently available.
 
 If you're looking to combine Numpy with a more complete Lisp ,see
-`<Hy https://github.com/hylang/hy>`__:
+`Hy <https://github.com/hylang/hy>`__:
 
 .. code-block:: clojure
 
