@@ -7,7 +7,7 @@ Snuggs are s-expressions for Numpy
 .. image:: https://travis-ci.org/mapbox/snuggs.svg?branch=master
    :target: https://travis-ci.org/mapbox/snuggs
 
-.. image:: https://coveralls.io/repos/mapbox/snuggs/badge.png
+.. image:: https://coveralls.io/repos/mapbox/snuggs/badge.svg
    :target: https://coveralls.io/r/mapbox/snuggs
 
 Expression syntax
