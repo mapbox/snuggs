@@ -110,6 +110,21 @@ def test_ufunc(truetrue, truefalse):
     assert list(result.flatten()) == [1.0, 0.0]
 
 
+def test_partial():
+    result = snuggs.eval('((partial * 2) 2)')
+    assert result == 4
+
+
+def test_map():
+    result = snuggs.eval('(map (partial * 2) (asarray 1 2 3))')
+    assert list(result) == [2, 4, 6]
+
+
+def test_map_asarray():
+    result = snuggs.eval('(asarray (map (partial * 2) (asarray 1 2 3)))')
+    assert list(result) == [2, 4, 6]
+
+
 # Fixtures.
 @pytest.fixture
 def ones():

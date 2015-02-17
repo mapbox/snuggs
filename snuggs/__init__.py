@@ -2,20 +2,22 @@
 Snuggs are s-expressions for Numpy.
 """
 
-
+import functools
+import itertools
 import operator
 import re
 import sys
 
 from pyparsing import (
     alphanums, ZeroOrMore, nums, oneOf, Word, Literal, Combine, QuotedString,
-    ParseException, Forward, Group, CaselessLiteral, Optional, alphas)
+    ParseException, Forward, Group, CaselessLiteral, Optional, alphas,
+    OneOrMore, ParseResults)
 
 import numpy
 
 
 __all__ = ['eval']
-__version__ = "1.0"
+__version__ = "1.1.0"
 
 # Python 2-3 compatibility
 string_types = (str,) if sys.version_info[0] >= 3 else (basestring,)
@@ -76,13 +78,22 @@ op_map = {
     '|': operator.or_
     }
 
+def asarray(*args):
+    if len(args) == 1 and hasattr(args[0], '__iter__'):
+        return numpy.asanyarray(list(args[0]))
+    else:
+        return numpy.asanyarray(list(args))
+
 func_map = {
-    'asarray': lambda *args: numpy.asanyarray(args),
+    'asarray': asarray,
     'read': _ctx.lookup,
     'take': lambda a, idx: numpy.take(a, idx-1, axis=0),
     }
 
-expr = Forward()
+higher_func_map = {
+    'map': itertools.map if sys.version_info[0] >= 3 else itertools.imap,
+    'partial': functools.partial,
+    }
 
 # Definition of the grammar.
 decimal = Literal('.')
@@ -110,25 +121,39 @@ string = QuotedString("'") | QuotedString('"')
 lparen = Literal('(').suppress()
 rparen = Literal(')').suppress()
 
-op = oneOf(' '.join(op_map.keys())).setResultsName('op').setParseAction(
+op = oneOf(' '.join(op_map.keys())).setParseAction(
     lambda s, l, t: op_map[t[0]])
 
-func = Word(alphanums + '_').setResultsName('func').setParseAction(
+func = Word(alphanums + '_').setParseAction(
     lambda s, l, t: (
         func_map[t[0]] if t[0] in func_map else getattr(numpy, t[0])))
 
-operand = expr | var | real | integer | string
+higher_func = oneOf('map partial').setParseAction(
+    lambda s, l, t: higher_func_map[t[0]])
 
-expr << Group(
+func_expr = Forward()
+higher_func_expr = Forward()
+expr = higher_func_expr | func_expr
+
+operand = higher_func_expr | func_expr | var | real | integer | string
+
+func_expr << Group(
     lparen +
-    (op | func) +
+    (higher_func_expr | op | func ) +
     operand +
+    ZeroOrMore(operand) +
+    rparen)
+
+higher_func_expr << Group(
+    lparen +
+    higher_func +
+    (higher_func_expr | op | func) +
     ZeroOrMore(operand) +
     rparen)
 
 
 def processArg(arg):
-    if isinstance(arg, string_types + (int, float, numpy.ndarray)):
+    if not isinstance(arg, ParseResults):
         return arg
     else:
         return processList(arg)
@@ -136,10 +161,8 @@ def processArg(arg):
 
 def processList(lst):
     args = [processArg(x) for x in lst[1:]]
-    if lst.op:
-        return lst.op(*args)
-    if lst.func:
-        return lst.func(*args)
+    func = processArg(lst[0])
+    return func(*args)
 
 
 def handleLine(line):
