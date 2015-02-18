@@ -91,7 +91,7 @@ func_map = {
     }
 
 higher_func_map = {
-    'map': itertools.map if sys.version_info[0] >= 3 else itertools.imap,
+    'map': map if sys.version_info[0] >= 3 else itertools.imap,
     'partial': functools.partial,
     }
 
