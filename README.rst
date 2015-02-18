@@ -2,18 +2,18 @@
 snuggs
 ======
 
+.. image:: https://travis-ci.org/mapbox/snuggs.svg?branch=master
+   :target: https://travis-ci.org/mapbox/snuggs
+
+.. image:: https://coveralls.io/repos/mapbox/snuggs/badge.svg
+   :target: https://coveralls.io/r/mapbox/snuggs
+
 Snuggs are s-expressions for Numpy
 
 .. code-block:: python
 
     >>> snuggs.eval("(+ (asarray 1 1) (asarray 2 2))")
     array([3, 3])
-
-.. image:: https://travis-ci.org/mapbox/snuggs.svg?branch=master
-   :target: https://travis-ci.org/mapbox/snuggs
-
-.. image:: https://coveralls.io/repos/mapbox/snuggs/badge.svg
-   :target: https://coveralls.io/r/mapbox/snuggs
 
 Syntax
 ======
@@ -71,10 +71,23 @@ and ``where()`` are also available.
 
 .. code-block:: python
 
-    snuggs.eval('(where (& tt tf) 1 0)',
+    snuggs.eval("(where (& tt tf) 1 0)",
         tt=numpy.array([True, True]),
         tf=numpy.array([True, False]))
     # array([1, 0])
+
+Higher-order functions
+======================
+
+New in snuggs 1.1 are higher-order functions ``map`` and ``partial``.
+
+.. code-block:: python
+
+    snuggs.eval("((partial * 2) 2)")
+    # 4
+
+    snuggs.eval('(asarray (map (partial * 2) (asarray 1 2 3)))')
+    # array([2, 4, 6])
 
 Performance notes
 =================
