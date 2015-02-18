@@ -115,7 +115,12 @@ def test_partial():
     assert result == 4
 
 
-def test_map():
+def test_map_func():
+    result = snuggs.eval('(map sqrt (asarray 1 4 9))')
+    assert list(result) == [1, 2, 3]
+
+
+def test_map_partial():
     result = snuggs.eval('(map (partial * 2) (asarray 1 2 3))')
     assert list(result) == [2, 4, 6]
 
