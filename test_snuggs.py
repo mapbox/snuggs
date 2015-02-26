@@ -130,6 +130,52 @@ def test_map_asarray():
     assert list(result) == [2, 4, 6]
 
 
+# Parse and syntax error testing.
+def test_missing_closing_paren():
+    with pytest.raises(SyntaxError) as excinfo:
+        result = snuggs.eval("(+ 1 2")
+    assert excinfo.value.lineno == 1
+    assert excinfo.value.offset == 7
+    assert str(excinfo.value) == 'Expected ")"'
+
+
+def test_missing_func():
+    with pytest.raises(SyntaxError) as excinfo:
+        result = snuggs.eval("(0 1 2)")
+    assert excinfo.value.lineno == 1
+    assert excinfo.value.offset == 2
+    assert str(excinfo.value) == "'0' is not a function or operator"
+
+
+def test_missing_func2():
+    with pytest.raises(SyntaxError) as excinfo:
+        result = snuggs.eval("(# 1 2)")
+    assert excinfo.value.lineno == 1
+    assert excinfo.value.offset == 2
+    assert str(excinfo.value) == "expected a function or operator"
+
+
+def test_undefined_var():
+    with pytest.raises(SyntaxError) as excinfo:
+        result = snuggs.eval("(+ 1 bogus)")
+    assert excinfo.value.lineno == 1
+    assert excinfo.value.offset == 6
+    assert str(excinfo.value) == "name 'bogus' is not defined"
+
+
+def test_bogus_higher_order_func():
+    with pytest.raises(SyntaxError) as excinfo:
+        result = snuggs.eval("((bogus * 2) 2)")
+    assert excinfo.value.lineno == 1
+    assert excinfo.value.offset == 3
+    assert str(excinfo.value) == "expected a function or operator"
+
+
+def test_type_error():
+    with pytest.raises(TypeError) as excinfo:
+        result = snuggs.eval("(+ 1 'bogus')")
+
+
 # Fixtures.
 @pytest.fixture
 def ones():

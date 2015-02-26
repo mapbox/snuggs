@@ -11,7 +11,7 @@ import sys
 from pyparsing import (
     alphanums, ZeroOrMore, nums, oneOf, Word, Literal, Combine, QuotedString,
     ParseException, Forward, Group, CaselessLiteral, Optional, alphas,
-    OneOrMore, ParseResults)
+    OneOrMore, ParseResults, ParseException)
 
 import numpy
 
@@ -63,6 +63,11 @@ class ctx(object):
         _ctx.clear()
 
 
+class ExpressionError(SyntaxError):
+    """Snuggs specific syntax errors"""
+    filename = "<string>"
+    lineno = 1
+
 op_map = {
     '*': operator.mul,
     '+': operator.add,
@@ -102,8 +107,18 @@ sign = Literal('+') | Literal('-')
 number = Word(nums)
 name = Word(alphas)
 
-var = name.setParseAction(
-    lambda s, l, t: _ctx.get(t[0]))
+
+def resolve_var(s, l, t):
+    try:
+        return _ctx.get(t[0])
+    except KeyError:
+        err = ExpressionError(
+            "name '%s' is not defined" % t[0])
+        err.text = s
+        err.offset = l + 1
+        raise err
+
+var = name.setParseAction(resolve_var)
 
 integer = Combine(
     Optional(sign) +
@@ -124,9 +139,18 @@ rparen = Literal(')').suppress()
 op = oneOf(' '.join(op_map.keys())).setParseAction(
     lambda s, l, t: op_map[t[0]])
 
-func = Word(alphanums + '_').setParseAction(
-    lambda s, l, t: (
-        func_map[t[0]] if t[0] in func_map else getattr(numpy, t[0])))
+
+def resolve_func(s, l, t):
+    try:
+        return func_map[t[0]] if t[0] in func_map else getattr(numpy, t[0])
+    except AttributeError:
+        err = ExpressionError(
+            "'%s' is not a function or operator" % t[0])
+        err.text = s
+        err.offset = l + 1
+        raise err
+
+func = Word(alphanums + '_').setParseAction(resolve_func)
 
 higher_func = oneOf('map partial').setParseAction(
     lambda s, l, t: higher_func_map[t[0]])
@@ -139,7 +163,7 @@ operand = higher_func_expr | func_expr | var | real | integer | string
 
 func_expr << Group(
     lparen +
-    (higher_func_expr | op | func ) +
+    (higher_func_expr | op | func) +
     operand +
     ZeroOrMore(operand) +
     rparen)
@@ -166,8 +190,21 @@ def processList(lst):
 
 
 def handleLine(line):
-    result = expr.parseString(line)
-    return processList(result[0])
+    try:
+        result = expr.parseString(line)
+        return processList(result[0])
+    except ParseException as exc:
+        text = str(exc)
+        m = re.search(r'(Expected .+) \(at char (\d+)\), \(line:(\d+)', text)
+        msg = m.group(1)
+        if 'map|partial' in msg:
+            msg = "expected a function or operator"
+        err = ExpressionError(msg)
+        err.text = line
+        err.filename = "<string>"
+        err.offset = int(m.group(2)) + 1
+        err.lineno = int(m.group(3))
+        raise err
 
 
 def eval(source, **kwds):
