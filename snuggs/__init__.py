@@ -201,9 +201,7 @@ def handleLine(line):
             msg = "expected a function or operator"
         err = ExpressionError(msg)
         err.text = line
-        err.filename = "<string>"
         err.offset = int(m.group(2)) + 1
-        err.lineno = int(m.group(3))
         raise err
 
 
