@@ -17,7 +17,7 @@ import numpy
 
 
 __all__ = ['eval']
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 
 # Python 2-3 compatibility
 string_types = (str,) if sys.version_info[0] >= 3 else (basestring,)
@@ -68,19 +68,31 @@ class ExpressionError(SyntaxError):
     filename = "<string>"
     lineno = 1
 
+
+def wrap_out(ufunc):
+    def wrapper(*args):
+        retval = ufunc(*args)
+        if retval is NotImplemented:
+            raise TypeError(
+                "unsupported operand type(s) for ufunc %s: '%s' and '%s'" % (
+                    ufunc.__name__, args[0], args[1]))
+        else:
+            return retval
+    return wrapper
+
 op_map = {
-    '*': operator.mul,
-    '+': operator.add,
-    '/': operator.truediv if sys.version_info[0] >= 3 else operator.div,
-    '-': operator.sub,
-    '<': operator.lt,
-    '<=': operator.le,
-    '==': operator.eq,
-    '!=': operator.ne,
-    '>=': operator.ge,
-    '>': operator.gt,
-    '&': operator.and_,
-    '|': operator.or_
+    '*': wrap_out(numpy.multiply),
+    '+': wrap_out(numpy.add),
+    '/': wrap_out(numpy.divide),
+    '-': wrap_out(numpy.subtract),
+    '<': wrap_out(numpy.less),
+    '<=': wrap_out(numpy.less_equal),
+    '==': wrap_out(numpy.equal),
+    '!=': wrap_out(numpy.not_equal),
+    '>=': wrap_out(numpy.greater_equal),
+    '>': wrap_out(numpy.greater),
+    '&': wrap_out(numpy.logical_and),
+    '|': wrap_out(numpy.logical_or),
     }
 
 def asarray(*args):
@@ -106,7 +118,7 @@ e = CaselessLiteral('E')
 sign = Literal('+') | Literal('-')
 number = Word(nums)
 name = Word(alphas)
-
+nil = Literal('nil').setParseAction(lambda s, l, t: [None])
 
 def resolve_var(s, l, t):
     try:
@@ -159,7 +171,7 @@ func_expr = Forward()
 higher_func_expr = Forward()
 expr = higher_func_expr | func_expr
 
-operand = higher_func_expr | func_expr | var | real | integer | string
+operand = higher_func_expr | func_expr | nil | var | real | integer | string
 
 func_expr << Group(
     lparen +
@@ -171,7 +183,7 @@ func_expr << Group(
 higher_func_expr << Group(
     lparen +
     higher_func +
-    (higher_func_expr | op | func) +
+    (nil | higher_func_expr | op | func) +
     ZeroOrMore(operand) +
     rparen)
 

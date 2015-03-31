@@ -130,6 +130,14 @@ def test_map_asarray():
     assert list(result) == [2, 4, 6]
 
 
+def test_nil():
+    assert snuggs.eval('(== nil nil)')
+    assert not snuggs.eval('(== 1 nil)')
+    assert not snuggs.eval('(== nil 1)')
+    assert snuggs.eval('(!= 1 nil)')
+    assert snuggs.eval('(!= nil 1)')
+
+
 # Parse and syntax error testing.
 def test_missing_closing_paren():
     with pytest.raises(SyntaxError) as excinfo:
