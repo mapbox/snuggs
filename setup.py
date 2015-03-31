@@ -8,7 +8,7 @@ with codecs_open('README.rst', encoding='utf-8') as f:
 
 
 setup(name='snuggs',
-      version='1.2.0',
+      version='1.3.0',
       description=u"Snuggs are s-expressions for Numpy",
       long_description=long_description,
       classifiers=[],
