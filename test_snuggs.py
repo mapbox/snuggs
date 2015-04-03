@@ -138,6 +138,13 @@ def test_nil():
     assert snuggs.eval('(!= nil 1)')
 
 
+def test_masked_arr():
+    foo = numpy.ma.masked_equal(numpy.array([0, 0, 0, 1], dtype='uint8'), 0)
+    r = snuggs.eval('(+ foo 1)', foo=foo)
+    assert list(r.data.flatten()) == [0, 0, 0, 2]
+    assert list(r.flatten()) == [numpy.ma.masked, numpy.ma.masked, numpy.ma.masked, 2]
+
+
 # Parse and syntax error testing.
 def test_missing_closing_paren():
     with pytest.raises(SyntaxError) as excinfo:
