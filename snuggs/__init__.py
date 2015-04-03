@@ -71,7 +71,7 @@ class ExpressionError(SyntaxError):
 op_map = {
     '*': operator.mul,
     '+': operator.add,
-    '/': operator.div,
+    '/': operator.truediv,
     '-': operator.sub,
     '<': operator.lt,
     '<=': operator.le,
