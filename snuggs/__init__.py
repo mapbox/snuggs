@@ -69,18 +69,18 @@ class ExpressionError(SyntaxError):
     lineno = 1
 
 op_map = {
-    '*': operator.mul,
-    '+': operator.add,
-    '/': operator.truediv,
-    '-': operator.sub,
+    '*': lambda *args: functools.reduce(lambda x, y: operator.mul(x, y), args),
+    '+': lambda *args: functools.reduce(lambda x, y: operator.add(x, y), args),
+    '/': lambda *args: functools.reduce(lambda x, y: operator.truediv(x, y), args),
+    '-': lambda *args: functools.reduce(lambda x, y: operator.sub(x, y), args),
+    '&': lambda *args: functools.reduce(lambda x, y: operator.and_(x, y), args),
+    '|': lambda *args: functools.reduce(lambda x, y: operator.or_(x, y), args),
     '<': operator.lt,
     '<=': operator.le,
     '==': operator.eq,
     '!=': operator.ne,
     '>=': operator.ge,
     '>': operator.gt,
-    '&': operator.and_,
-    '|': operator.or_,
     }
 
 def asarray(*args):
