@@ -1,6 +1,5 @@
 import numpy
 import pytest
-import re
 
 import snuggs
 
