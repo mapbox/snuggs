@@ -18,6 +18,10 @@ def test_int_expr():
     assert snuggs.eval('(+ 1 2)') == 3
 
 
+def test_int_mult_expr():
+    assert snuggs.eval('(+ 1 2 3)') == 6
+
+
 def test_real_expr():
     assert round(snuggs.eval('(* 0.1 0.2)'), 3) == 0.02
 
@@ -128,6 +132,12 @@ def test_map_partial():
 def test_map_asarray():
     result = snuggs.eval('(asarray (map (partial * 2) (asarray 1 2 3)))')
     assert list(result) == [2, 4, 6]
+
+
+def test_multi_operator_array(ones):
+    result = snuggs.eval(
+        '(+ ones (/ ones 1 0.5) (* ones 1 3))', ones=ones)
+    assert list(result.flatten()) == [6.0] * 4
 
 
 def test_nil():
