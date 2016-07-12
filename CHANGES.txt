@@ -1,6 +1,11 @@
 Changes
 =======
 
+1.4.0 (2016-07-12)
+------------------
+- New feature: mathematical operators like + and * can take multiple arguments
+  as in Hy and other Lisps (#7).
+
 1.3.1 (2015-04-03)
 ------------------
 - Revert to operator functions in op_map (#4).
