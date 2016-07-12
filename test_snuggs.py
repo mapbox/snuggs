@@ -1,5 +1,6 @@
 import numpy
 import pytest
+import re
 
 import snuggs
 
@@ -151,7 +152,9 @@ def test_missing_closing_paren():
         result = snuggs.eval("(+ 1 2")
     assert excinfo.value.lineno == 1
     assert excinfo.value.offset == 7
-    assert str(excinfo.value) == 'Expected ")"'
+    exception_options = ['expected a function or operator',
+                         'Expected {Forward: ... | Forward: ...}']
+    assert str(excinfo.value) in exception_options
 
 
 def test_missing_func():
@@ -167,7 +170,9 @@ def test_missing_func2():
         result = snuggs.eval("(# 1 2)")
     assert excinfo.value.lineno == 1
     assert excinfo.value.offset == 2
-    assert str(excinfo.value) == "expected a function or operator"
+    exception_options = ['expected a function or operator',
+                         'Expected {Forward: ... | Forward: ...}']
+    assert str(excinfo.value) in exception_options
 
 
 def test_undefined_var():
@@ -183,7 +188,9 @@ def test_bogus_higher_order_func():
         result = snuggs.eval("((bogus * 2) 2)")
     assert excinfo.value.lineno == 1
     assert excinfo.value.offset == 3
-    assert str(excinfo.value) == "expected a function or operator"
+    exception_options = ['expected a function or operator',
+                         'Expected {Forward: ... | Forward: ...}']
+    assert str(excinfo.value) in exception_options
 
 
 def test_type_error():
