@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 import numpy
 import pytest
 
@@ -40,8 +42,14 @@ def test_arr_var(ones):
 
 
 def test_arr_lookup(ones):
-    r = snuggs.eval('(read 1)', foo=ones)
+    kwargs = OrderedDict((('foo', ones),
+                          ('bar', 2.0 * ones),
+                          ('a', 3.0 * ones)))
+    r = snuggs.eval('(read 1)', kwargs)
     assert list(r.flatten()) == [1, 1, 1, 1]
+    # Passed via kwargs this should fail (see issue #9)
+    r = snuggs.eval('(read 1)', **kwargs)
+    assert list(r.flatten()) != [1, 1, 1, 1]
 
 
 def test_arr_lookup_2(ones):
