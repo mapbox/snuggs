@@ -47,9 +47,15 @@ def test_arr_lookup(ones):
                           ('a', 3.0 * ones)))
     r = snuggs.eval('(read 1)', kwargs)
     assert list(r.flatten()) == [1, 1, 1, 1]
-    # Passed via kwargs this should fail (see issue #9)
+
+
+@pytest.mark.xfail(reason="Keyword argument order can't be relied on")
+def test_arr_lookup_kwarg_order(ones):
+    kwargs = OrderedDict((('foo', ones),
+                          ('bar', 2.0 * ones),
+                          ('a', 3.0 * ones)))
     r = snuggs.eval('(read 1)', **kwargs)
-    assert list(r.flatten()) != [1, 1, 1, 1]
+    assert list(r.flatten()) == [1, 1, 1, 1]
 
 
 def test_arr_lookup_2(ones):
@@ -166,7 +172,7 @@ def test_masked_arr():
 # Parse and syntax error testing.
 def test_missing_closing_paren():
     with pytest.raises(SyntaxError) as excinfo:
-        result = snuggs.eval("(+ 1 2")
+        snuggs.eval("(+ 1 2")
     assert excinfo.value.lineno == 1
     assert excinfo.value.offset == 7
     exception_options = ['expected a function or operator',
@@ -176,7 +182,7 @@ def test_missing_closing_paren():
 
 def test_missing_func():
     with pytest.raises(SyntaxError) as excinfo:
-        result = snuggs.eval("(0 1 2)")
+        snuggs.eval("(0 1 2)")
     assert excinfo.value.lineno == 1
     assert excinfo.value.offset == 2
     assert str(excinfo.value) == "'0' is not a function or operator"
@@ -184,7 +190,7 @@ def test_missing_func():
 
 def test_missing_func2():
     with pytest.raises(SyntaxError) as excinfo:
-        result = snuggs.eval("(# 1 2)")
+        snuggs.eval("(# 1 2)")
     assert excinfo.value.lineno == 1
     assert excinfo.value.offset == 2
     exception_options = ['expected a function or operator',
@@ -194,7 +200,7 @@ def test_missing_func2():
 
 def test_undefined_var():
     with pytest.raises(SyntaxError) as excinfo:
-        result = snuggs.eval("(+ 1 bogus)")
+        snuggs.eval("(+ 1 bogus)")
     assert excinfo.value.lineno == 1
     assert excinfo.value.offset == 6
     assert str(excinfo.value) == "name 'bogus' is not defined"
@@ -202,7 +208,7 @@ def test_undefined_var():
 
 def test_bogus_higher_order_func():
     with pytest.raises(SyntaxError) as excinfo:
-        result = snuggs.eval("((bogus * 2) 2)")
+        snuggs.eval("((bogus * 2) 2)")
     assert excinfo.value.lineno == 1
     assert excinfo.value.offset == 3
     exception_options = ['expected a function or operator',
@@ -211,8 +217,8 @@ def test_bogus_higher_order_func():
 
 
 def test_type_error():
-    with pytest.raises(TypeError) as excinfo:
-        result = snuggs.eval("(+ 1 'bogus')")
+    with pytest.raises(TypeError):
+        snuggs.eval("(+ 1 'bogus')")
 
 
 # Fixtures.

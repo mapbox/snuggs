@@ -11,13 +11,13 @@ import sys
 from pyparsing import (
     alphanums, ZeroOrMore, nums, oneOf, Word, Literal, Combine, QuotedString,
     ParseException, Forward, Group, CaselessLiteral, Optional, alphas,
-    OneOrMore, ParseResults, ParseException)
+    OneOrMore, ParseResults)
 
 import numpy
 
 
 __all__ = ['eval']
-__version__ = "1.4.0"
+__version__ = "1.4.1"
 
 # Python 2-3 compatibility
 string_types = (str,) if sys.version_info[0] >= 3 else (basestring,)
@@ -35,9 +35,9 @@ class Context(object):
         return self._data[name]
 
     def lookup(self, index, subindex=None):
-        s = list(self._data.values())[int(index)-1]
+        s = list(self._data.values())[int(index) - 1]
         if subindex:
-            return s[int(subindex)-1]
+            return s[int(subindex) - 1]
         else:
             return s
 
@@ -80,8 +80,7 @@ op_map = {
     '==': operator.eq,
     '!=': operator.ne,
     '>=': operator.ge,
-    '>': operator.gt,
-    }
+    '>': operator.gt}
 
 def asarray(*args):
     if len(args) == 1 and hasattr(args[0], '__iter__'):
@@ -92,13 +91,11 @@ def asarray(*args):
 func_map = {
     'asarray': asarray,
     'read': _ctx.lookup,
-    'take': lambda a, idx: numpy.take(a, idx-1, axis=0),
-    }
+    'take': lambda a, idx: numpy.take(a, idx - 1, axis=0)}
 
 higher_func_map = {
     'map': map if sys.version_info[0] >= 3 else itertools.imap,
-    'partial': functools.partial,
-    }
+    'partial': functools.partial}
 
 # Definition of the grammar.
 decimal = Literal('.')
@@ -122,14 +119,12 @@ var = name.setParseAction(resolve_var)
 
 integer = Combine(
     Optional(sign) +
-    number
-    ).setParseAction(lambda s, l, t: int(t[0]))
+    number).setParseAction(lambda s, l, t: int(t[0]))
 
 real = Combine(
     integer +
     decimal + Optional(number) +
-    Optional(e + integer)
-    ).setParseAction(lambda s, l, t: float(t[0]))
+    Optional(e + integer)).setParseAction(lambda s, l, t: float(t[0]))
 
 string = QuotedString("'") | QuotedString('"')
 
