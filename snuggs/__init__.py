@@ -1,7 +1,7 @@
 """
 Snuggs are s-expressions for Numpy.
 """
-
+from collections import OrderedDict
 import functools
 import itertools
 import operator
@@ -26,7 +26,7 @@ string_types = (str,) if sys.version_info[0] >= 3 else (basestring,)
 class Context(object):
 
     def __init__(self):
-        self._data = {}
+        self._data = OrderedDict()
 
     def add(self, name, val):
         self._data[name] = val
@@ -42,15 +42,15 @@ class Context(object):
             return s
 
     def clear(self):
-        self._data = {}
+        self._data = OrderedDict()
 
 _ctx = Context()
 
 
 class ctx(object):
 
-    def __init__(self, **kwds):
-        self.kwds = kwds
+    def __init__(self, kwd_dict=None, **kwds):
+        self.kwds = kwd_dict or kwds
 
     def __enter__(self):
         _ctx.clear()
@@ -205,6 +205,7 @@ def handleLine(line):
         raise err
 
 
-def eval(source, **kwds):
-    with ctx(**kwds):
+def eval(source, kwd_dict=None, **kwds):
+    kwd_dict = kwd_dict or kwds
+    with ctx(kwd_dict):
         return handleLine(source)

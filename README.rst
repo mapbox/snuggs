@@ -57,6 +57,22 @@ Expressions can also refer by name to arrays in a local context.
     snuggs.eval("(+ (asarray 1 1) b)", b=np.array([2, 2]))
     # array([3, 3])
 
+This local context may be provided using keyword arguments (e.g.,
+``b=np.array([2, 2])``), or by passing a dictionary that stores
+the keys and associated array values. Passing a dictionary, specifically
+an ``OrderedDict``, is important when using a function or operator that
+references the order in which values have been provided. For example,
+the ``read`` function will lookup the `i-th` value passed:
+
+.. code-block:: python
+
+    ctx = OrderedDict((
+        ('a', np.array([5, 5])),
+        ('b', np.array([2, 2]))
+    ))
+    snuggs.eval("(- (read 1) (read 2))", ctx)
+    # array([3, 3])
+
 Functions and operators
 =======================
 
