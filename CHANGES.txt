@@ -1,6 +1,10 @@
 Changes
 =======
 
+1.4.2 (2018-06-07)
+------------------
+- Add missing docstrings and improve existing ones.
+
 1.4.1 (2017-01-02)
 ------------------
 - Bug fix: accept OrderedDict as evaluation context to enable reliable read()

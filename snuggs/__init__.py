@@ -1,6 +1,5 @@
-"""
-Snuggs are s-expressions for Numpy.
-"""
+"""Snuggs are s-expressions for Numpy."""
+
 from collections import OrderedDict
 import functools
 import itertools
@@ -17,10 +16,10 @@ import numpy
 
 
 __all__ = ['eval']
-__version__ = "1.4.1"
+__version__ = "1.4.2"
 
 # Python 2-3 compatibility
-string_types = (str,) if sys.version_info[0] >= 3 else (basestring,)
+string_types = (str,) if sys.version_info[0] >= 3 else (basestring,)  # flake8: noqa
 
 
 class Context(object):
@@ -44,6 +43,7 @@ class Context(object):
     def clear(self):
         self._data = OrderedDict()
 
+
 _ctx = Context()
 
 
@@ -64,9 +64,11 @@ class ctx(object):
 
 
 class ExpressionError(SyntaxError):
-    """Snuggs specific syntax errors"""
+    """A Snuggs-specific syntax error."""
+
     filename = "<string>"
     lineno = 1
+
 
 op_map = {
     '*': lambda *args: functools.reduce(lambda x, y: operator.mul(x, y), args),
@@ -87,6 +89,7 @@ def asarray(*args):
         return numpy.asanyarray(list(args[0]))
     else:
         return numpy.asanyarray(list(args))
+
 
 func_map = {
     'asarray': asarray,
@@ -114,6 +117,7 @@ def resolve_var(s, l, t):
         err.text = s
         err.offset = l + 1
         raise err
+
 
 var = name.setParseAction(resolve_var)
 
@@ -144,6 +148,7 @@ def resolve_func(s, l, t):
         err.text = s
         err.offset = l + 1
         raise err
+
 
 func = Word(alphanums + '_').setParseAction(resolve_func)
 
@@ -201,6 +206,22 @@ def handleLine(line):
 
 
 def eval(source, kwd_dict=None, **kwds):
+    """Evaluate a snuggs expression.
+
+    Parameters
+    ----------
+    source : str
+        Expression source.
+    kwd_dict : dict
+        A dict of items that form the evaluation context. Deprecated.
+    kwds : dict
+        A dict of items that form the valuation context.
+
+    Returns
+    -------
+    object
+
+    """
     kwd_dict = kwd_dict or kwds
     with ctx(kwd_dict):
         return handleLine(source)
