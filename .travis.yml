@@ -1,12 +1,18 @@
 language: python
 python:
   - "2.7"
-  - "3.4"
+  - "3.6"
 install:
-  - "pip install pytest"
-  - "pip install coveralls"
+  - "pip install pytest-cov coveralls"
   - "pip install -e ."
 script: 
-  - coverage run --source=snuggs -m py.test
+  - python -m pytest --cov snuggs --cov-report term-missing
 after_success:
   - coveralls
+deploy:
+  on:
+    tags: true
+    condition: "$TRAVIS_PYTHON_VERSION = 3.6"
+  provider: pypi
+  user: mapboxci
+  distributions: "sdist bdist_wheel"
