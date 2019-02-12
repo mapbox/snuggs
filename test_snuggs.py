@@ -48,6 +48,10 @@ def test_arr_lookup(ones):
     r = snuggs.eval('(read 1)', kwargs)
     assert list(r.flatten()) == [1, 1, 1, 1]
 
+def test_arr_var_long(ones):
+    r = snuggs.eval('(+ FOO_BAR_42 0)', FOO_BAR_42=ones)
+    assert list(r.flatten()) == [1, 1, 1, 1]
+
 
 @pytest.mark.xfail(reason="Keyword argument order can't be relied on")
 def test_arr_lookup_kwarg_order(ones):
