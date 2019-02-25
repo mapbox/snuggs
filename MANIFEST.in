@@ -1,0 +1,2 @@
+include CHANGES.txt AUTHORS.txt LICENSE VERSION.txt README.rst setup.py CODE_OF_CONDUCT.txt test_snuggs.py
+exclude MANIFEST.in
