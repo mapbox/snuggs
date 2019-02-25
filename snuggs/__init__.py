@@ -10,7 +10,7 @@ import sys
 from pyparsing import (
     alphanums, ZeroOrMore, nums, oneOf, Word, Literal, Combine, QuotedString,
     ParseException, Forward, Group, CaselessLiteral, Optional, alphas,
-    OneOrMore, ParseResults)
+    OneOrMore, ParseResults, pyparsing_common)
 
 import numpy
 
@@ -105,7 +105,7 @@ decimal = Literal('.')
 e = CaselessLiteral('E')
 sign = Literal('+') | Literal('-')
 number = Word(nums)
-name = Word(alphas)
+name = pyparsing_common.identifier
 nil = Literal('nil').setParseAction(lambda s, l, t: [None])
 
 def resolve_var(s, l, t):
