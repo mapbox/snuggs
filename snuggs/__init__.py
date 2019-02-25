@@ -16,7 +16,7 @@ import numpy
 
 
 __all__ = ['eval']
-__version__ = "1.4.2"
+__version__ = "1.4.3"
 
 # Python 2-3 compatibility
 string_types = (str,) if sys.version_info[0] >= 3 else (basestring,)  # flake8: noqa
