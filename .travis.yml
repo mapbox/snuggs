@@ -3,7 +3,7 @@ python:
   - "2.7"
   - "3.6"
 install:
-  - "pip install pytest-cov coveralls"
+  - "pip install pytest-cov coveralls pyparsing==2.3.1"
   - "pip install -e ."
 script: 
   - python -m pytest --cov snuggs --cov-report term-missing
