@@ -29,6 +29,6 @@ setup(
     packages=find_packages(exclude=["ez_setup", "examples", "tests"]),
     include_package_data=True,
     zip_safe=False,
-    install_requires=["numpy", "pyparsing"],
+    install_requires=["numpy", "pyparsing>=2.1.6"],
     extras_require={"test": ["pytest", "hypothesis"]},
 )

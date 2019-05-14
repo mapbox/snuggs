@@ -16,7 +16,7 @@ import numpy
 
 
 __all__ = ['eval']
-__version__ = "1.4.4"
+__version__ = "1.4.5"
 
 # Python 2-3 compatibility
 string_types = (str,) if sys.version_info[0] >= 3 else (basestring,)  # flake8: noqa
@@ -121,16 +121,6 @@ def resolve_var(s, l, t):
 
 var = name.setParseAction(resolve_var)
 
-integer = Combine(
-    Optional(sign) +
-    number).setParseAction(lambda s, l, t: int(t[0]))
-
-real = Combine(
-    Optional(sign) +
-    integer +
-    Optional(decimal) + Optional(number) +
-    Optional(e + integer)).setParseAction(lambda s, l, t: float(t[0]))
-
 string = QuotedString("'") | QuotedString('"')
 
 lparen = Literal('(').suppress()
@@ -160,7 +150,7 @@ func_expr = Forward()
 higher_func_expr = Forward()
 expr = higher_func_expr | func_expr
 
-operand = higher_func_expr | func_expr | nil | var | real | integer | string
+operand = higher_func_expr | func_expr | nil | var | pyparsing_common.number | string
 
 func_expr << Group(
     lparen +
