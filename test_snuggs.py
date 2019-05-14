@@ -1,19 +1,36 @@
 from collections import OrderedDict
 
+from hypothesis import given
+from hypothesis.strategies import floats, integers
 import numpy
 import pytest
 
 import snuggs
 
-# Fixtures follow the tests. See the end of the file.
+
+@pytest.fixture
+def ones():
+    return numpy.ones((2, 2))
 
 
-def test_integer():
-    assert list(snuggs.integer.parseString('1')) == [1]
+@pytest.fixture
+def truetrue():
+    return numpy.array([True, True])
 
 
-def test_real():
-    assert list(snuggs.real.parseString('1.1')) == [1.1]
+@pytest.fixture
+def truefalse():
+    return numpy.array([True, False])
+
+
+@given(integers())
+def test_integer(num):
+    assert list(snuggs.integer.parseString(str(num))) == [num]
+
+
+@given(floats(allow_infinity=False, allow_nan=False))
+def test_real(num):
+    assert list(snuggs.real.parseString(str(num))) == [num]
 
 
 def test_int_expr():
@@ -225,17 +242,6 @@ def test_type_error():
         snuggs.eval("(+ 1 'bogus')")
 
 
-# Fixtures.
-@pytest.fixture
-def ones():
-    return numpy.ones((2, 2))
-
-
-@pytest.fixture
-def truetrue():
-    return numpy.array([True, True])
-
-
-@pytest.fixture
-def truefalse():
-    return numpy.array([True, False])
+def test_negative_decimal():
+    """Negative decimals parse correctly"""
+    assert snuggs.eval("(< -0.9 0)")
