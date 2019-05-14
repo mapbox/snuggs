@@ -16,7 +16,7 @@ import numpy
 
 
 __all__ = ['eval']
-__version__ = "1.4.3"
+__version__ = "1.4.4dev"
 
 # Python 2-3 compatibility
 string_types = (str,) if sys.version_info[0] >= 3 else (basestring,)  # flake8: noqa
@@ -126,8 +126,9 @@ integer = Combine(
     number).setParseAction(lambda s, l, t: int(t[0]))
 
 real = Combine(
+    Optional(sign) +
     integer +
-    decimal + Optional(number) +
+    Optional(decimal) + Optional(number) +
     Optional(e + integer)).setParseAction(lambda s, l, t: float(t[0]))
 
 string = QuotedString("'") | QuotedString('"')

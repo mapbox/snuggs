@@ -30,5 +30,5 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=["numpy", "pyparsing"],
-    extras_require={"test": ["pytest"]},
+    extras_require={"test": ["pytest", "hypothesis"]},
 )
