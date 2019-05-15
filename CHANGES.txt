@@ -1,6 +1,11 @@
 Changes
 =======
 
+1.4.6 (2019-05-15)
+------------------
+- Tests were failing on Python 2.7 (#20, #21) due to loss of precision in
+  str(num). This has been fixed by using repr(num).
+
 1.4.5 (2019-05-14)
 ------------------
 - Replace custom integer and real parsers with pyparsing_common's number (#19).

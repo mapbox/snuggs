@@ -25,12 +25,12 @@ def truefalse():
 
 @given(integers())
 def test_integer_operand(num):
-    assert list(snuggs.operand.parseString(str(num))) == [num]
+    assert list(snuggs.operand.parseString(repr(num))) == [num]
 
 
 @given(floats(allow_infinity=False, allow_nan=False))
 def test_real_operand(num):
-    assert list(snuggs.operand.parseString(str(num))) == [num]
+    assert list(snuggs.operand.parseString(repr(num))) == [num]
 
 
 def test_int_expr():
