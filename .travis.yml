@@ -5,7 +5,7 @@ python:
   - "3.6"
   - "3.7"
 install:
-  - "pip install pytest-cov coveralls pyparsing==2.3.1"
+  - "pip install pytest-cov coveralls pyparsing~=2.0"
   - "pip install -e .[test]"
 script: 
   - python -m pytest --cov snuggs --cov-report term-missing
@@ -16,5 +16,5 @@ deploy:
     tags: true
     condition: "$TRAVIS_PYTHON_VERSION = 3.6"
   provider: pypi
-  user: mapboxci
+  user: __token__
   distributions: "sdist bdist_wheel"
