@@ -1,6 +1,12 @@
 Changes
 =======
 
+1.4.7 (2019-09-18)
+------------------
+- The snuggs tests of syntax errors no longer assert a specific pyparsing
+  exception message as the format of these messages is not stable (#15).
+  Previous versions of snuggs had no other issues with pyparsing 2.3 or 2.4.
+
 1.4.6 (2019-05-15)
 ------------------
 - Tests were failing on Python 2.7 (#20, #21) due to loss of precision in

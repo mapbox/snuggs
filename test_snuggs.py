@@ -196,9 +196,6 @@ def test_missing_closing_paren():
         snuggs.eval("(+ 1 2")
     assert excinfo.value.lineno == 1
     assert excinfo.value.offset == 7
-    exception_options = ['expected a function or operator',
-                         'Expected {Forward: ... | Forward: ...}']
-    assert str(excinfo.value) in exception_options
 
 
 def test_missing_func():
@@ -214,9 +211,6 @@ def test_missing_func2():
         snuggs.eval("(# 1 2)")
     assert excinfo.value.lineno == 1
     assert excinfo.value.offset == 2
-    exception_options = ['expected a function or operator',
-                         'Expected {Forward: ... | Forward: ...}']
-    assert str(excinfo.value) in exception_options
 
 
 def test_undefined_var():
@@ -232,9 +226,6 @@ def test_bogus_higher_order_func():
         snuggs.eval("((bogus * 2) 2)")
     assert excinfo.value.lineno == 1
     assert excinfo.value.offset == 3
-    exception_options = ['expected a function or operator',
-                         'Expected {Forward: ... | Forward: ...}']
-    assert str(excinfo.value) in exception_options
 
 
 def test_type_error():
