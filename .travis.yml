@@ -5,9 +5,9 @@ python:
   - "3.6"
   - "3.7"
 install:
-  - "pip install pytest-cov coveralls pyparsing~=2.0"
+  - "pip install attrs==19.1.0 pytest==4.0.2 hypothesis==4.38.1 pytest-cov coveralls pyparsing~=2.0"
   - "pip install -e .[test]"
-script: 
+script:
   - python -m pytest --cov snuggs --cov-report term-missing
 after_success:
   - coveralls
