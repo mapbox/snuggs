@@ -34,11 +34,18 @@ class Context(object):
         return self._data[name]
 
     def lookup(self, index, subindex=None):
-        s = list(self._data.values())[int(index) - 1]
-        if subindex:
-            return s[int(subindex) - 1]
-        else:
+        # Indexes are 1-based. index 0 is -1, and Python would return the last input.
+        values = list(self._data.values())
+        i = int(index) - 1
+        if i < 0 or i >= len(values):
+            raise IndexError("index %s is out of range" % index)
+        s = values[i]
+        if subindex is None:
             return s
+        j = int(subindex) - 1
+        if j < 0 or j >= len(s):
+            raise IndexError("index %s is out of range" % subindex)
+        return s[j]
 
     def clear(self):
         self._data = OrderedDict()
@@ -91,10 +98,18 @@ def asarray(*args):
         return numpy.asanyarray(list(args))
 
 
+def take(a, idx):
+    # 1-based, same as read. Index 0 must not select the last row.
+    i = int(idx) - 1
+    if i < 0 or i >= len(a):
+        raise IndexError("index %s is out of range" % idx)
+    return numpy.take(a, i, axis=0)
+
+
 func_map = {
     'asarray': asarray,
     'read': _ctx.lookup,
-    'take': lambda a, idx: numpy.take(a, idx - 1, axis=0)}
+    'take': take}
 
 higher_func_map = {
     'map': map if sys.version_info[0] >= 3 else itertools.imap,
