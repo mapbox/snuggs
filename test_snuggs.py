@@ -236,3 +236,14 @@ def test_type_error():
 def test_negative_decimal():
     """Negative decimals parse correctly"""
     assert snuggs.eval("(< -0.9 0)")
+
+
+def test_index_zero_is_out_of_range():
+    # 1-based. 0 used to wrap to the last input or the last row.
+    with pytest.raises(IndexError):
+        snuggs.eval('(read 0)', a=numpy.array([1, 1]), b=numpy.array([9, 9]))
+    foo = numpy.array([[1, 2], [3, 4]])
+    with pytest.raises(IndexError):
+        snuggs.eval('(take foo 0)', foo=foo)
+    with pytest.raises(IndexError):
+        snuggs.eval('(read 1 0)', foo=foo)
